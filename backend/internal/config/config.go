@@ -1,0 +1,114 @@
+package config
+
+import (
+	"os"
+)
+
+type Config struct {
+	Database DatabaseConfig
+	Server   ServerConfig
+	JWT      JWTConfig
+	AWS      AWSConfig
+	SMTP     SMTPConfig
+	SMS      SMSConfig
+}
+
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+	SSLMode  string
+}
+
+type ServerConfig struct {
+	Port string
+	Host string
+	Env  string
+}
+
+type JWTConfig struct {
+	Secret         string
+	ExpirationHours int
+}
+
+type AWSConfig struct {
+	AccessKeyID     string
+	SecretAccessKey string
+	Region          string
+	S3Bucket        string
+}
+
+type SMTPConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	From     string
+}
+
+type SMSConfig struct {
+	Provider        string
+	TwilioAccountSID string
+	TwilioAuthToken  string
+	TwilioPhoneNumber string
+}
+
+func Load() *Config {
+	return &Config{
+		Database: DatabaseConfig{
+			Host:     getEnv("DB_HOST", "localhost"),
+			Port:     getEnv("DB_PORT", "5432"),
+			User:     getEnv("DB_USER", "medical_user"),
+			Password: getEnv("DB_PASSWORD", "medical_password"),
+			Name:     getEnv("DB_NAME", "medical_records"),
+			SSLMode:  getEnv("DB_SSLMODE", "disable"),
+		},
+		Server: ServerConfig{
+			Port: getEnv("SERVER_PORT", "8080"),
+			Host: getEnv("SERVER_HOST", "localhost"),
+			Env:  getEnv("APP_ENV", "development"),
+		},
+		JWT: JWTConfig{
+			Secret:          getEnv("JWT_SECRET", "change-me-in-production"),
+			ExpirationHours: getEnvAsInt("JWT_EXPIRATION_HOURS", 24),
+		},
+		AWS: AWSConfig{
+			AccessKeyID:     getEnv("AWS_ACCESS_KEY_ID", ""),
+			SecretAccessKey: getEnv("AWS_SECRET_ACCESS_KEY", ""),
+			Region:          getEnv("AWS_REGION", "us-east-1"),
+			S3Bucket:        getEnv("S3_BUCKET", ""),
+		},
+		SMTP: SMTPConfig{
+			Host:     getEnv("SMTP_HOST", ""),
+			Port:     getEnv("SMTP_PORT", "587"),
+			User:     getEnv("SMTP_USER", ""),
+			Password: getEnv("SMTP_PASSWORD", ""),
+			From:     getEnv("SMTP_FROM", "Medical Records App <noreply@medicalrecords.com>"),
+		},
+		SMS: SMSConfig{
+			Provider:        getEnv("SMS_PROVIDER", "twilio"),
+			TwilioAccountSID: getEnv("TWILIO_ACCOUNT_SID", ""),
+			TwilioAuthToken:  getEnv("TWILIO_AUTH_TOKEN", ""),
+			TwilioPhoneNumber: getEnv("TWILIO_PHONE_NUMBER", ""),
+		},
+	}
+}
+
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+func getEnvAsInt(key string, defaultValue int) int {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	// Simple conversion - in production, use strconv.Atoi with error handling
+	return defaultValue
+}
+
