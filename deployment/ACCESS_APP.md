@@ -132,6 +132,14 @@ If you get CORS errors:
 2. Add: `FRONTEND_URL` = `https://medical-records-frontend.onrender.com`
 3. Save and redeploy
 
+## 🚨 Service Suspended?
+
+If you see "This service has been suspended by its owner":
+1. Go to Render Dashboard → Your service
+2. Click **"Resume"** or **"Unsuspend"** button
+3. Wait for service to deploy (2-5 minutes)
+4. See [SERVICE_SUSPENDED_FIX.md](./SERVICE_SUSPENDED_FIX.md) for detailed help
+
 ## 🐛 Troubleshooting
 
 ### Backend Not Starting
