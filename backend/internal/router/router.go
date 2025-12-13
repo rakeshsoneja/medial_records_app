@@ -34,30 +34,23 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		allowedOrigins = append(allowedOrigins, frontendURL)
 	}
 	
-	// Configure CORS with flexible origin handling for production
+	// Configure CORS - be permissive in production to handle Render deployments
 	corsConfig := cors.Config{
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
 		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
 		AllowCredentials: true,
 		MaxAge:           12 * 3600, // 12 hours
 	}
 	
-	// In production, use flexible origin matching if FRONTEND_URL is not set
-	// This allows any .onrender.com origin as a fallback
+	// In production, allow all origins if FRONTEND_URL is not set (for Render flexibility)
+	// Otherwise use explicit allowed origins
 	if cfg.Server.Env == "production" && frontendURL == "" {
+		// Allow all origins in production as fallback (Render frontends can have different URLs)
 		corsConfig.AllowOriginFunc = func(origin string) bool {
-			// Allow localhost for development/testing
-			if origin == "http://localhost:3000" || origin == "http://localhost:3001" {
-				return true
-			}
-			// Allow any HTTPS origin from onrender.com (Render frontend URLs)
-			if len(origin) > 0 && (origin[:8] == "https://" || origin[:7] == "http://") {
-				// Check if it's a Render URL or allow all HTTPS origins in production
-				// This is a fallback - ideally FRONTEND_URL should be set
-				return true
-			}
-			return false
+			// Allow any origin in production if FRONTEND_URL not set
+			// This is a fallback - ideally FRONTEND_URL should be set for security
+			return true
 		}
 	} else {
 		// Use explicit allowed origins
