@@ -12,6 +12,8 @@ Your frontend service is now live! 🎉 Here's what to do next to get your full 
 
 ### Step 1: Create and Link Database
 
+**⚠️ IMPORTANT**: If you see "localhost" connection errors, see [FIX_DATABASE_CONNECTION.md](./FIX_DATABASE_CONNECTION.md) for detailed help.
+
 **This is REQUIRED for the backend to work.**
 
 1. **Create PostgreSQL Database**:
