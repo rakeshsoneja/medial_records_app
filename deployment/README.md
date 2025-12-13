@@ -123,6 +123,17 @@ See `frontend-env.template` for all required variables.
 **Required:**
 - `REACT_APP_API_URL`: Your backend service URL
 
+## 🌐 Accessing Your Deployed App
+
+**See [ACCESS_APP.md](./ACCESS_APP.md) for complete instructions on accessing your app after deployment.**
+
+Quick steps:
+1. Get your service URLs from Render Dashboard
+2. Configure database connection (see [RENDER_DATABASE_SETUP.md](./RENDER_DATABASE_SETUP.md))
+3. Update frontend API URL
+4. Create default user (run seed script)
+5. Access your app at the frontend URL
+
 ## 🔄 Post-Deployment Steps
 
 ### 1. Run Database Migrations
