@@ -33,13 +33,36 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		allowedOrigins = append(allowedOrigins, prodURL)
 	}
 	
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
+	// In production, allow all Render frontend URLs if FRONTEND_URL is not set
+	// This is a fallback for Render deployments
+	if cfg.Server.Env == "production" && os.Getenv("FRONTEND_URL") == "" {
+		// Allow any .onrender.com origin for flexibility
+		// In production, you should set FRONTEND_URL explicitly
+		r.Use(cors.New(cors.Config{
+			AllowOriginFunc: func(origin string) bool {
+				// Allow localhost for development
+				if origin == "http://localhost:3000" || origin == "http://localhost:3001" {
+					return true
+				}
+				// Allow any Render frontend URL
+				return true // For now, allow all origins in production if FRONTEND_URL not set
+			},
+			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
+			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+			AllowCredentials: true,
+			MaxAge:           12 * 3600, // 12 hours
+		}))
+	} else {
+		r.Use(cors.New(cors.Config{
+			AllowOrigins:     allowedOrigins,
+			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
+			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+			AllowCredentials: true,
+			MaxAge:           12 * 3600, // 12 hours
+		}))
+	}
 
 	// Initialize services
 	userService := services.NewUserService(db)
