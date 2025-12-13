@@ -22,39 +22,43 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	r := gin.Default()
 
 	// CORS configuration
-	// Get allowed origins from environment or use defaults
-	allowedOrigins := []string{
-		"http://localhost:3000",
-		"http://localhost:3001",
-	}
+	// In production, allow all origins for Render flexibility
+	// In development, use explicit localhost origins
+	var corsConfig cors.Config
 	
-	// Add production frontend URL if set
-	frontendURL := os.Getenv("FRONTEND_URL")
-	if frontendURL != "" {
-		allowedOrigins = append(allowedOrigins, frontendURL)
-	}
-	
-	// Configure CORS - be permissive in production to handle Render deployments
-	corsConfig := cors.Config{
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
-		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
-		AllowCredentials: true,
-		MaxAge:           12 * 3600, // 12 hours
-	}
-	
-	// In production, allow all origins if FRONTEND_URL is not set (for Render flexibility)
-	// Otherwise use explicit allowed origins
-	if cfg.Server.Env == "production" && frontendURL == "" {
-		// Allow all origins in production as fallback (Render frontends can have different URLs)
-		corsConfig.AllowOriginFunc = func(origin string) bool {
-			// Allow any origin in production if FRONTEND_URL not set
-			// This is a fallback - ideally FRONTEND_URL should be set for security
-			return true
+	if cfg.Server.Env == "production" {
+		// Production: Allow all origins (Render frontends can have different URLs)
+		corsConfig = cors.Config{
+			AllowOriginFunc: func(origin string) bool {
+				// Allow all origins in production
+				return true
+			},
+			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
+			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+			AllowCredentials: true,
+			MaxAge:           12 * 3600, // 12 hours
 		}
 	} else {
-		// Use explicit allowed origins
-		corsConfig.AllowOrigins = allowedOrigins
+		// Development: Use explicit allowed origins
+		allowedOrigins := []string{
+			"http://localhost:3000",
+			"http://localhost:3001",
+		}
+		
+		// Add production frontend URL if set (for testing)
+		if frontendURL := os.Getenv("FRONTEND_URL"); frontendURL != "" {
+			allowedOrigins = append(allowedOrigins, frontendURL)
+		}
+		
+		corsConfig = cors.Config{
+			AllowOrigins:     allowedOrigins,
+			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
+			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+			AllowCredentials: true,
+			MaxAge:           12 * 3600, // 12 hours
+		}
 	}
 	
 	r.Use(cors.New(corsConfig))
