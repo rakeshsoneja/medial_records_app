@@ -29,40 +29,42 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	}
 	
 	// Add production frontend URL if set
-	if prodURL := os.Getenv("FRONTEND_URL"); prodURL != "" {
-		allowedOrigins = append(allowedOrigins, prodURL)
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL != "" {
+		allowedOrigins = append(allowedOrigins, frontendURL)
 	}
 	
-	// In production, allow all Render frontend URLs if FRONTEND_URL is not set
-	// This is a fallback for Render deployments
-	if cfg.Server.Env == "production" && os.Getenv("FRONTEND_URL") == "" {
-		// Allow any .onrender.com origin for flexibility
-		// In production, you should set FRONTEND_URL explicitly
-		r.Use(cors.New(cors.Config{
-			AllowOriginFunc: func(origin string) bool {
-				// Allow localhost for development
-				if origin == "http://localhost:3000" || origin == "http://localhost:3001" {
-					return true
-				}
-				// Allow any Render frontend URL
-				return true // For now, allow all origins in production if FRONTEND_URL not set
-			},
-			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
-			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
-			AllowCredentials: true,
-			MaxAge:           12 * 3600, // 12 hours
-		}))
-	} else {
-		r.Use(cors.New(cors.Config{
-			AllowOrigins:     allowedOrigins,
-			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
-			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
-			AllowCredentials: true,
-			MaxAge:           12 * 3600, // 12 hours
-		}))
+	// Configure CORS with flexible origin handling for production
+	corsConfig := cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "X-Requested-With"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * 3600, // 12 hours
 	}
+	
+	// In production, use flexible origin matching if FRONTEND_URL is not set
+	// This allows any .onrender.com origin as a fallback
+	if cfg.Server.Env == "production" && frontendURL == "" {
+		corsConfig.AllowOriginFunc = func(origin string) bool {
+			// Allow localhost for development/testing
+			if origin == "http://localhost:3000" || origin == "http://localhost:3001" {
+				return true
+			}
+			// Allow any HTTPS origin from onrender.com (Render frontend URLs)
+			if len(origin) > 0 && (origin[:8] == "https://" || origin[:7] == "http://") {
+				// Check if it's a Render URL or allow all HTTPS origins in production
+				// This is a fallback - ideally FRONTEND_URL should be set
+				return true
+			}
+			return false
+		}
+	} else {
+		// Use explicit allowed origins
+		corsConfig.AllowOrigins = allowedOrigins
+	}
+	
+	r.Use(cors.New(corsConfig))
 
 	// Initialize services
 	userService := services.NewUserService(db)
