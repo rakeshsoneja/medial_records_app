@@ -1,0 +1,7 @@
+# Deployment-specific files that shouldn't be committed
+*.env
+*.env.local
+secrets/
+*.key
+*.pem
+

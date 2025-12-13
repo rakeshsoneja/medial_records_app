@@ -1,0 +1,65 @@
+# Backend Environment Variables Template for Render
+# Copy these to your Render backend service environment variables
+
+# ============================================
+# DATABASE CONFIGURATION
+# ============================================
+# These are usually auto-filled when you link the PostgreSQL service
+# If not, get them from your PostgreSQL service dashboard
+
+DB_HOST=<from-postgres-service>
+DB_PORT=5432
+DB_USER=medical_user
+DB_PASSWORD=<from-postgres-service>
+DB_NAME=medical_records
+DB_SSLMODE=require
+
+# ============================================
+# SERVER CONFIGURATION
+# ============================================
+# Render automatically sets PORT, but you can override
+SERVER_PORT=8080
+SERVER_HOST=0.0.0.0
+
+# ============================================
+# JWT CONFIGURATION
+# ============================================
+# Generate a strong random secret (minimum 32 characters)
+# You can use: openssl rand -base64 32
+JWT_SECRET=<generate-strong-random-secret-here>
+JWT_EXPIRATION_HOURS=24
+
+# ============================================
+# APPLICATION ENVIRONMENT
+# ============================================
+APP_ENV=production
+APP_DEBUG=false
+
+# ============================================
+# AWS S3 CONFIGURATION (Optional - for file uploads)
+# ============================================
+# Uncomment and fill if you want to enable file uploads
+# AWS_ACCESS_KEY_ID=your-aws-access-key
+# AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+# AWS_REGION=us-east-1
+# S3_BUCKET=medical-records-storage
+
+# ============================================
+# EMAIL CONFIGURATION (Optional - for sharing)
+# ============================================
+# Uncomment and fill if you want to enable email sharing
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=your-email@gmail.com
+# SMTP_PASSWORD=your-app-password
+# SMTP_FROM=Medical Records App <noreply@medicalrecords.com>
+
+# ============================================
+# SMS CONFIGURATION (Optional - for sharing)
+# ============================================
+# Uncomment and fill if you want to enable SMS sharing
+# SMS_PROVIDER=twilio
+# TWILIO_ACCOUNT_SID=your-twilio-account-sid
+# TWILIO_AUTH_TOKEN=your-twilio-auth-token
+# TWILIO_PHONE_NUMBER=+1234567890
+

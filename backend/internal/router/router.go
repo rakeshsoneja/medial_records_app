@@ -5,6 +5,7 @@ import (
 	"medical-records-app/internal/handlers"
 	"medical-records-app/internal/middleware"
 	"medical-records-app/internal/services"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -21,8 +22,19 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	r := gin.Default()
 
 	// CORS configuration
+	// Get allowed origins from environment or use defaults
+	allowedOrigins := []string{
+		"http://localhost:3000",
+		"http://localhost:3001",
+	}
+	
+	// Add production frontend URL if set
+	if prodURL := os.Getenv("FRONTEND_URL"); prodURL != "" {
+		allowedOrigins = append(allowedOrigins, prodURL)
+	}
+	
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001"},
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

@@ -1,0 +1,11 @@
+{
+  "name": "medical-records-frontend",
+  "type": "static",
+  "region": "oregon",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "publishDirectory": "frontend/build",
+  "envVars": {
+    "REACT_APP_API_URL": "https://medical-records-backend.onrender.com/api/v1"
+  }
+}
+

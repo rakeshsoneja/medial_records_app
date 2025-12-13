@@ -61,7 +61,11 @@ func main() {
 	r := router.Initialize(db, cfg)
 
 	// Start server
-	port := os.Getenv("SERVER_PORT")
+	// Render provides PORT environment variable, fallback to SERVER_PORT or 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = os.Getenv("SERVER_PORT")
+	}
 	if port == "" {
 		port = "8080"
 	}

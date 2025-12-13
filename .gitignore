@@ -46,3 +46,9 @@ coverage/
 tmp/
 temp/
 
+# Deployment (keep configs, ignore secrets)
+deployment/*.env
+deployment/secrets/
+deployment/*.key
+deployment/*.pem
+
