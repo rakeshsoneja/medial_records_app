@@ -18,15 +18,29 @@ deployment/
 
 ### Option 1: Using render.yaml (Recommended)
 
-1. **Connect Repository to Render**
+**⚠️ IMPORTANT: Create Database First!**
+
+Render Blueprints do not support creating databases. You must create the PostgreSQL database manually before deploying services.
+
+1. **Create PostgreSQL Database** (See [RENDER_DATABASE_SETUP.md](./RENDER_DATABASE_SETUP.md))
+   - Go to Render Dashboard → "New +" → "PostgreSQL"
+   - Create database: `medical-records-db`
+   - Save connection details
+
+2. **Deploy Services with Blueprint**
    - Go to https://dashboard.render.com
    - Click "New +" → "Blueprint"
    - Connect your GitHub repository
-   - Select `deployment/render.yaml` as the blueprint file
+   - Select `render.yaml` (or `deployment/render.yaml`) as the blueprint file
    - Click "Apply"
 
-2. **Set Environment Variables**
-   - After services are created, go to each service
+3. **Configure Database Connection**
+   - After backend service is created, go to `medical-records-backend` service
+   - Click "Environment" tab
+   - Add database connection variables (see [RENDER_DATABASE_SETUP.md](./RENDER_DATABASE_SETUP.md))
+   - Or use "Link Database" feature if in same region
+
+4. **Set Other Environment Variables**
    - Add any missing environment variables from the templates
 
 ### Option 2: Manual Service Setup

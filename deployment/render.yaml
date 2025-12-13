@@ -1,11 +1,4 @@
 services:
-  # PostgreSQL Database
-  - type: postgresql
-    name: medical-records-db
-    plan: free
-    databaseName: medical_records
-    databaseUser: medical_user
-
   # Backend API Service
   - type: web
     name: medical-records-backend
@@ -15,26 +8,14 @@ services:
     buildCommand: cd backend && go mod download && go build -o ../bin/server ./cmd/server
     startCommand: ./bin/server
     envVars:
-      - key: DB_HOST
-        fromDatabase:
-          name: medical-records-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: medical-records-db
-          property: port
-      - key: DB_USER
-        fromDatabase:
-          name: medical-records-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: medical-records-db
-          property: password
-      - key: DB_NAME
-        fromDatabase:
-          name: medical-records-db
-          property: database
+      # Database connection - Create PostgreSQL database manually in Render Dashboard first
+      # Then add these environment variables in the service settings:
+      # - DB_HOST (from your PostgreSQL service)
+      # - DB_PORT (from your PostgreSQL service)
+      # - DB_USER (from your PostgreSQL service)
+      # - DB_PASSWORD (from your PostgreSQL service)
+      # - DB_NAME (database name, e.g., medical_records)
+      # - DB_SSLMODE=require
       - key: DB_SSLMODE
         value: require
       - key: SERVER_PORT
