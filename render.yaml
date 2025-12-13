@@ -30,19 +30,12 @@ services:
         value: false
 
   # Frontend Service
-  - type: web
+  - type: static
     name: medical-records-frontend
-    env: node
     region: oregon
-    plan: free
     buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npx serve -s build -l 3000
+    staticPublishPath: ./frontend/build
     envVars:
       - key: REACT_APP_API_URL
-        fromService:
-          name: medical-records-backend
-          type: web
-          property: host
         value: https://medical-records-backend.onrender.com/api/v1
-    staticPublishPath: ./frontend/build
 
