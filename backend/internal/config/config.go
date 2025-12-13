@@ -1,7 +1,10 @@
 package config
 
 import (
+	"fmt"
+	"net/url"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -56,15 +59,27 @@ type SMSConfig struct {
 }
 
 func Load() *Config {
-	return &Config{
-		Database: DatabaseConfig{
+	// Check if DATABASE_URL is provided (Render sometimes uses this)
+	databaseURL := os.Getenv("DATABASE_URL")
+	
+	var dbConfig DatabaseConfig
+	if databaseURL != "" {
+		// Parse DATABASE_URL format: postgres://user:password@host:port/dbname?sslmode=require
+		dbConfig = parseDatabaseURL(databaseURL)
+	} else {
+		// Use individual environment variables
+		dbConfig = DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "medical_user"),
 			Password: getEnv("DB_PASSWORD", "medical_password"),
 			Name:     getEnv("DB_NAME", "medical_records"),
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
-		},
+		}
+	}
+	
+	return &Config{
+		Database: dbConfig,
 		Server: ServerConfig{
 			Port: getEnv("SERVER_PORT", "8080"),
 			Host: getEnv("SERVER_HOST", "localhost"),
@@ -110,5 +125,48 @@ func getEnvAsInt(key string, defaultValue int) int {
 	}
 	// Simple conversion - in production, use strconv.Atoi with error handling
 	return defaultValue
+}
+
+// parseDatabaseURL parses a PostgreSQL connection URL
+// Format: postgres://user:password@host:port/dbname?sslmode=require
+func parseDatabaseURL(databaseURL string) DatabaseConfig {
+	config := DatabaseConfig{
+		Host:     "localhost",
+		Port:     "5432",
+		User:     "medical_user",
+		Password: "medical_password",
+		Name:     "medical_records",
+		SSLMode:  "require",
+	}
+
+	// Parse the URL
+	parsedURL, err := url.Parse(databaseURL)
+	if err != nil {
+		return config
+	}
+
+	// Extract host and port
+	config.Host = parsedURL.Hostname()
+	if parsedURL.Port() != "" {
+		config.Port = parsedURL.Port()
+	}
+
+	// Extract user and password
+	if parsedURL.User != nil {
+		config.User = parsedURL.User.Username()
+		if password, ok := parsedURL.User.Password(); ok {
+			config.Password = password
+		}
+	}
+
+	// Extract database name (remove leading slash)
+	config.Name = strings.TrimPrefix(parsedURL.Path, "/")
+
+	// Extract SSL mode from query parameters
+	if parsedURL.Query().Get("sslmode") != "" {
+		config.SSLMode = parsedURL.Query().Get("sslmode")
+	}
+
+	return config
 }
 

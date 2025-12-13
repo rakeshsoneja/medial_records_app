@@ -38,6 +38,10 @@ func main() {
 	// Load configuration
 	cfg := config.Load()
 
+	// Log database configuration (without password) for debugging
+	log.Printf("Database config - Host: %s, Port: %s, User: %s, DB: %s, SSLMode: %s",
+		cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Name, cfg.Database.SSLMode)
+
 	// Initialize database (will create tables automatically via migrations)
 	db, err := database.Initialize(cfg)
 	if err != nil {
