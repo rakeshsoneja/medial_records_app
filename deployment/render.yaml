@@ -1,6 +1,6 @@
 services:
   # PostgreSQL Database
-  - type: psql
+  - type: postgresql
     name: medical-records-db
     plan: free
     databaseName: medical_records
