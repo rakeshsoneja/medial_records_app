@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 )
 
 // @title Medical Records Management API
@@ -43,7 +44,10 @@ func main() {
 		cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Name, cfg.Database.SSLMode)
 
 	// Initialize database (will create tables automatically via migrations)
-	db, err := database.Initialize(cfg)
+	var db *gorm.DB
+	var err error
+	
+	db, err = database.Initialize(cfg)
 	if err != nil {
 		log.Printf("Database connection failed: %v", err)
 		log.Println("")
@@ -53,15 +57,19 @@ func main() {
 		log.Printf("  CREATE DATABASE %s;", cfg.Database.Name)
 		log.Printf("  CREATE USER %s WITH PASSWORD '%s';", cfg.Database.User, cfg.Database.Password)
 		log.Printf("  GRANT ALL PRIVILEGES ON DATABASE %s TO %s;", cfg.Database.Name, cfg.Database.User)
-		log.Fatalf("Failed to initialize database: %v", err)
+		log.Println("")
+		log.Println("⚠️  WARNING: Server will start but database-dependent endpoints will fail!")
+		log.Println("⚠️  Health endpoint will still work.")
+		db = nil // Set to nil so router knows database is not available
+	} else {
+		// Run migrations only if database is connected
+		if err := database.RunMigrations(db); err != nil {
+			log.Printf("Failed to run migrations: %v", err)
+			log.Println("⚠️  WARNING: Migrations failed, but server will continue")
+		}
 	}
 
-	// Run migrations
-	if err := database.RunMigrations(db); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
-
-	// Initialize router
+	// Initialize router (pass nil db if connection failed - health endpoint will still work)
 	r := router.Initialize(db, cfg)
 
 	// Start server
