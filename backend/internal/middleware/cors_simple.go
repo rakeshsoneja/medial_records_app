@@ -35,38 +35,35 @@ func SimpleCORSMiddleware() gin.HandlerFunc {
 		
 		// Determine which origin to allow
 		// CRITICAL: When AllowCredentials is true, we MUST use the exact origin, not *
+		// ALWAYS use the requesting origin if present - this fixes URL mismatches
 		allowOrigin := ""
 		if origin != "" {
-			// Normalize origins (remove trailing slashes for comparison)
-			normalizedOrigin := strings.TrimSuffix(origin, "/")
+			// ALWAYS use the requesting origin - this is the safest approach
+			// The browser requires exact match, so we must return the exact origin from the request
+			allowOrigin = origin
 			
-			// Check if origin is in allowed list (with flexible matching)
-			found := false
+			// Log if it doesn't match configured origins (for debugging)
+			normalizedOrigin := strings.TrimSuffix(origin, "/")
+			matched := false
 			for _, allowed := range allowedOrigins {
 				normalizedAllowed := strings.TrimSuffix(allowed, "/")
-				// Exact match or match without trailing slash
-				if normalizedOrigin == normalizedAllowed || origin == allowed || origin == normalizedAllowed || origin == allowed+"/" {
-					allowOrigin = origin // Use the exact origin from request
-					found = true
+				if normalizedOrigin == normalizedAllowed {
+					matched = true
 					break
 				}
 			}
 			
-			// If not found in list, be permissive: allow the requesting origin
-			// This ensures CORS works even if there's a slight mismatch
-			if !found {
-				allowOrigin = origin
-				if len(allowedOrigins) > 0 {
-					log.Printf("CORS: Origin %s not exactly in allowed list %v, but allowing it anyway", origin, allowedOrigins)
-				} else {
-					log.Printf("CORS: No allowed origins configured, allowing requesting origin: %s", origin)
-				}
+			if matched {
+				log.Printf("CORS: Origin %s matched configured allowed origins", origin)
+			} else if len(allowedOrigins) > 0 {
+				log.Printf("CORS: WARNING - Origin %s does not match configured FRONTEND_URL %v, but allowing it anyway", origin, allowedOrigins)
 			} else {
-				log.Printf("CORS: Origin %s matched allowed origins", origin)
+				log.Printf("CORS: Allowing origin %s (no FRONTEND_URL configured)", origin)
 			}
 		} else if len(allowedOrigins) > 0 {
 			// No origin header (e.g., same-origin request), use first allowed
 			allowOrigin = allowedOrigins[0]
+			log.Printf("CORS: No origin header, using configured FRONTEND_URL: %s", allowOrigin)
 		} else {
 			// Last resort: use * but disable credentials (browser requirement)
 			allowOrigin = "*"
