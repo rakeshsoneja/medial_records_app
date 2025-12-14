@@ -185,7 +185,9 @@ After backend is deployed, migrations run automatically on startup. If they don'
 
 **"Cannot connect to backend"**
 - Verify `REACT_APP_API_URL` is set correctly
-- Check CORS settings in backend
+- **CORS Issues**: See [CORS_COMPLETE_GUIDE.md](./CORS_COMPLETE_GUIDE.md) for comprehensive CORS fix
+  - Quick fix: [CORS_QUICK_FIX.md](./CORS_QUICK_FIX.md)
+  - Set `APP_ENV=production` and `FRONTEND_URL` in backend environment variables
 - Ensure backend URL includes `/api/v1`
 
 **"Build failed"**
