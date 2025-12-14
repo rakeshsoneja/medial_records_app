@@ -19,9 +19,10 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 	r := gin.Default()
 
-	// Apply CORS middleware - handles both development and production
+	// Apply CORS middleware - using simple middleware for guaranteed CORS fix
 	// This middleware properly handles OPTIONS preflight requests
-	r.Use(middleware.CORSMiddleware())
+	// Try simple middleware first (more permissive, always works)
+	r.Use(middleware.SimpleCORSMiddleware())
 
 	// Initialize services
 	userService := services.NewUserService(db)

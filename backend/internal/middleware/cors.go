@@ -94,14 +94,19 @@ func GetCORSConfig() cors.Config {
 			config.AllowOrigins = allowedOrigins
 			log.Printf("CORS: Production mode with allowed origins: %v", allowedOrigins)
 		} else {
-			// Fallback: Allow all origins (less secure but works for Render)
-			// This is a fallback - ideally FRONTEND_URL should be set
+			// CRITICAL: When AllowCredentials is true, we CANNOT use AllowOriginFunc with wildcard
+			// Browser will reject it. We must either:
+			// 1. Set AllowCredentials to false, OR
+			// 2. Use explicit origins
+			// For now, we'll disable credentials and allow all origins as fallback
+			log.Println("CORS: Production mode - WARNING: FRONTEND_URL not set!")
+			log.Println("CORS: WARNING: Disabling credentials to allow all origins (not recommended for production)")
+			config.AllowCredentials = false
 			config.AllowOriginFunc = func(origin string) bool {
 				// Log the origin for debugging
-				log.Printf("CORS: Allowing origin (fallback mode): %s", origin)
+				log.Printf("CORS: Allowing origin (fallback mode, no credentials): %s", origin)
 				return true
 			}
-			log.Println("CORS: Production mode - WARNING: Allowing all origins (FRONTEND_URL not set)")
 		}
 	} else {
 		// Development configuration
@@ -145,19 +150,32 @@ func CORSMiddleware() gin.HandlerFunc {
 	
 	// Return a custom handler that ensures OPTIONS requests are handled
 	return func(c *gin.Context) {
+		origin := c.Request.Header.Get("Origin")
+		log.Printf("CORS: Request from origin: %s, Method: %s, Path: %s", origin, c.Request.Method, c.Request.URL.Path)
+		
 		// Handle preflight OPTIONS requests
 		if c.Request.Method == "OPTIONS" {
+			log.Printf("CORS: Handling OPTIONS preflight request")
 			// Let the CORS middleware handle it
 			corsHandler(c)
 			// If the middleware didn't abort, we should return 204
 			if !c.IsAborted() {
 				c.Status(204)
+				log.Printf("CORS: OPTIONS request handled successfully")
+			} else {
+				log.Printf("CORS: OPTIONS request was aborted")
 			}
 			return
 		}
 		
 		// For all other requests, apply CORS headers
 		corsHandler(c)
+		
+		// Log response headers for debugging
+		if origin != "" {
+			allowedOrigin := c.Writer.Header().Get("Access-Control-Allow-Origin")
+			log.Printf("CORS: Response - Allowed-Origin: %s, Origin: %s", allowedOrigin, origin)
+		}
 		
 		// Continue to next handler
 		if !c.IsAborted() {
