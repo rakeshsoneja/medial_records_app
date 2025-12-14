@@ -44,6 +44,12 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
+	// Explicit OPTIONS handler for all routes (backup for CORS preflight)
+	r.OPTIONS("/*path", func(c *gin.Context) {
+		// CORS middleware should handle this, but this ensures it works
+		c.Status(204)
+	})
+
 	// Swagger documentation
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
