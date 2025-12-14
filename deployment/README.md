@@ -10,8 +10,9 @@ deployment/
 ├── render.yaml            # Render service configuration
 ├── backend-env.template   # Backend environment variables template
 ├── frontend-env.template  # Frontend environment variables template
-├── deploy-backend.sh      # Backend deployment script
-└── deploy-frontend.sh     # Frontend deployment script
+├── CORS_COMPLETE_GUIDE.md # Complete CORS troubleshooting guide
+├── CORS_QUICK_FIX.md      # Quick CORS fix reference
+└── [other deployment guides...]
 ```
 
 ## 🚀 Quick Start
