@@ -37,6 +37,12 @@ func SimpleCORSMiddleware() gin.HandlerFunc {
 		// CRITICAL: When AllowCredentials is true, we MUST use the exact origin, not *
 		// ALWAYS use the requesting origin if present - this fixes URL mismatches
 		allowOrigin := ""
+		
+		// Log all environment variables for debugging
+		log.Printf("CORS DEBUG: FRONTEND_URL=%s, ALLOWED_ORIGINS=%s, Request Origin=%s", 
+			frontendURL, allowedOriginsEnv, origin)
+		log.Printf("CORS DEBUG: Allowed origins list: %v", allowedOrigins)
+		
 		if origin != "" {
 			// ALWAYS use the requesting origin - this is the safest approach
 			// The browser requires exact match, so we must return the exact origin from the request
@@ -69,6 +75,9 @@ func SimpleCORSMiddleware() gin.HandlerFunc {
 			allowOrigin = "*"
 			log.Printf("CORS: WARNING - Using wildcard origin, credentials will be disabled")
 		}
+		
+		// Final log to confirm what we're setting
+		log.Printf("CORS DEBUG: Setting Access-Control-Allow-Origin to: %s", allowOrigin)
 		
 		// Set CORS headers
 		if allowOrigin != "" {
