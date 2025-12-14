@@ -51,7 +51,9 @@ func Initialize(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	})
 
 	// Swagger documentation
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// Configure Swagger to look for docs in ./docs directory
+	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER")
+	r.GET("/swagger/*any", swaggerHandler)
 
 	// API routes
 	api := r.Group("/api/v1")
