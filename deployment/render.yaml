@@ -5,8 +5,8 @@ services:
     env: go
     region: oregon
     plan: free
-    buildCommand: cd backend && go mod download && go install github.com/swaggo/swag/cmd/swag@latest && swag init -g cmd/server/main.go -o ./docs && go build -o ../bin/server ./cmd/server
-    startCommand: cd backend && ./bin/server
+    buildCommand: cd backend && go mod download && go install github.com/swaggo/swag/cmd/swag@latest && swag init -g cmd/server/main.go -o ./docs && cp -r docs ../docs && go build -o ../bin/server ./cmd/server
+    startCommand: ./bin/server
     envVars:
       # Database connection - Create PostgreSQL database manually in Render Dashboard first
       # Then add these environment variables in the service settings:
