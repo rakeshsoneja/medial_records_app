@@ -20,3 +20,6 @@ const AppointmentCard = ({ appointment }) => {
 
 export default AppointmentCard;
 
+
+
+

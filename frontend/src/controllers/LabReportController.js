@@ -66,3 +66,6 @@ class LabReportController {
 
 export default new LabReportController();
 
+
+
+

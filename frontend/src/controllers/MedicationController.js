@@ -80,3 +80,6 @@ class MedicationController {
 
 export default new MedicationController();
 
+
+
+

@@ -63,3 +63,6 @@ class InsuranceController {
 
 export default new InsuranceController();
 
+
+
+

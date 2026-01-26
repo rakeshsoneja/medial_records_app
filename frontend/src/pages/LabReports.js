@@ -79,6 +79,11 @@ const LabReports = () => {
           <p>No lab reports found. Add your first lab report above.</p>
         )}
       </div>
+      <div className="fixed-bottom-bar">
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancel' : 'Add Lab Report'}
+        </button>
+      </div>
     </div>
   );
 };

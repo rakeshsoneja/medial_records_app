@@ -79,3 +79,6 @@ const InsuranceForm = ({ formData, onChange, onSubmit, onCancel }) => {
 
 export default InsuranceForm;
 
+
+
+

@@ -197,3 +197,6 @@ To add a new record type (e.g., "Vehicle Insurance"):
 
 This pattern ensures consistency and makes the codebase easily navigable.
 
+
+
+

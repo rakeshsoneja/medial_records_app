@@ -26,3 +26,6 @@ const LabReportCard = ({ labReport }) => {
 
 export default LabReportCard;
 
+
+
+

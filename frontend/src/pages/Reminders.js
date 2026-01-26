@@ -81,6 +81,11 @@ const Reminders = () => {
           <p>No reminders found. Add your first reminder above.</p>
         )}
       </div>
+      <div className="fixed-bottom-bar">
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancel' : 'Add Reminder'}
+        </button>
+      </div>
     </div>
   );
 };

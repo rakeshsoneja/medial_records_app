@@ -71,3 +71,6 @@ const AppointmentForm = ({ formData, onChange, onSubmit, onCancel }) => {
 
 export default AppointmentForm;
 
+
+
+

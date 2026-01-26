@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardController from '../controllers/DashboardController';
 import './Dashboard.css';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState({
     prescriptions: [],
     appointments: [],
@@ -36,7 +38,7 @@ const Dashboard = () => {
       <h1>Dashboard</h1>
 
       <div className="dashboard-grid">
-        <div className="dashboard-card">
+        <div className="dashboard-card" onClick={() => navigate('/appointments')}>
           <h2>Upcoming Appointments</h2>
           {dashboardData.appointments.length > 0 ? (
             <ul>
@@ -53,7 +55,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="dashboard-card">
+        <div className="dashboard-card" onClick={() => navigate('/prescriptions')}>
           <h2>Active Prescriptions</h2>
           {dashboardData.prescriptions.length > 0 ? (
             <ul>
@@ -70,7 +72,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="dashboard-card">
+        <div className="dashboard-card" onClick={() => navigate('/lab-reports')}>
           <h2>Recent Lab Reports</h2>
           {dashboardData.labReports.length > 0 ? (
             <ul>
@@ -87,7 +89,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="dashboard-card">
+        <div className="dashboard-card" onClick={() => navigate('/medications')}>
           <h2>Active Medications</h2>
           {dashboardData.medications.length > 0 ? (
             <ul>
@@ -104,7 +106,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="dashboard-card">
+        <div className="dashboard-card" onClick={() => navigate('/reminders')}>
           <h2>Upcoming Reminders</h2>
           {dashboardData.reminders.length > 0 ? (
             <ul>

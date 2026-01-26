@@ -25,3 +25,6 @@ const MedicationCard = ({ medication }) => {
 
 export default MedicationCard;
 
+
+
+

@@ -31,3 +31,6 @@ const PrescriptionCard = ({ prescription, onDelete }) => {
 
 export default PrescriptionCard;
 
+
+
+

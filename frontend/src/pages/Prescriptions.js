@@ -98,6 +98,11 @@ const Prescriptions = () => {
           <p>No prescriptions found. Add your first prescription above.</p>
         )}
       </div>
+      <div className="fixed-bottom-bar">
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancel' : 'Add Prescription'}
+        </button>
+      </div>
     </div>
   );
 };

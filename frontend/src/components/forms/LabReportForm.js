@@ -64,3 +64,6 @@ const LabReportForm = ({ formData, onChange, onSubmit, onCancel }) => {
 
 export default LabReportForm;
 
+
+
+

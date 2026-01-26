@@ -83,6 +83,11 @@ const Insurance = () => {
           <p>No insurance records found. Add your first insurance record above.</p>
         )}
       </div>
+      <div className="fixed-bottom-bar">
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancel' : 'Add Insurance'}
+        </button>
+      </div>
     </div>
   );
 };

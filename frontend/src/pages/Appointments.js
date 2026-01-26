@@ -81,6 +81,11 @@ const Appointments = () => {
           <p>No upcoming appointments. Add your first appointment above.</p>
         )}
       </div>
+      <div className="fixed-bottom-bar">
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancel' : 'Add Appointment'}
+        </button>
+      </div>
     </div>
   );
 };

@@ -35,3 +35,6 @@ const InsuranceCard = ({ insurance }) => {
 
 export default InsuranceCard;
 
+
+
+
